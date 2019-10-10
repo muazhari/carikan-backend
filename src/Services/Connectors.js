@@ -1,4 +1,4 @@
-import Models from "../Models"
+import Models from '../Models'
 
 class President {
   constructor() {

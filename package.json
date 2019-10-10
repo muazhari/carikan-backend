@@ -1,12 +1,12 @@
 {
   "name": "carikan-server",
   "version": "0.0.1",
-  "description": "Using latest JavaScript features on the server",
+  "description": "Carikan App Server",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/vmasto/express-babel.git"
+    "url": "git+https://github.com/muazhari/carikan-server.git"
   },
-  "author": "Vassilis Mastorostergios <vmasto@gmail.com>",
+  "author": "Muhammad Kharisma Azhari <kharisma.azhari02@gmail.com>",
   "license": "MIT",
   "main": "dist/index.js",
   "engines": {
@@ -40,8 +40,11 @@
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-preset-env": "^1.7.0",
     "body-parser": "^1.18.2",
+    "chai": "^4.2.0",
     "express": "^4.16.4",
+    "mocha": "^6.2.1",
     "morgan": "^1.9.1",
+    "nyc": "^14.1.1",
     "pug": "^2.0.3",
     "rimraf": "^2.6.3"
   },

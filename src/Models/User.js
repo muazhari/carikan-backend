@@ -1,16 +1,16 @@
-import { Schema, model } from "mongoose"
+import { Schema, model } from 'mongoose'
 
 const PhoneNumberSchema = new Schema(
   {
     number: {
       type: String,
       required: false,
-      unique: true
+      unique: true,
     },
     default: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
   { _id: false }
 )
@@ -20,39 +20,39 @@ const UserSchema = new Schema(
     uid: {
       type: String,
       unique: true,
-      required: true
+      required: true,
     },
     displayName: {
       type: String,
-      required: false
+      required: false,
     },
     email: {
       type: String,
       unique: true,
-      required: true
+      required: true,
     },
     phoneNumber: {
       type: [PhoneNumberSchema],
-      required: false
+      required: false, //Should be true
     },
     photoURL: {
       type: String,
-      required: true
+      required: true,
     },
     username: {
       type: String,
-      required: false
+      required: false,
     },
     newUser: {
       type: Boolean,
-      default: true
+      default: true,
     },
     posts: {
-      type: [{ postId: String, _id: false }]
-    }
+      type: [{ postId: String, _id: false }],
+    },
   },
   { timestamps: true }
 )
 
-const User = model("user", UserSchema)
+const User = model('user', UserSchema)
 export default User

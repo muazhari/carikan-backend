@@ -1,6 +1,6 @@
-import { Router } from "express"
-import { Post, User, Comment } from "../Models"
-import { Types } from "mongoose"
+import { Router } from 'express'
+import { Post, User, Comment } from '../Models'
+import { Types } from 'mongoose'
 
 const routes = Router()
 
@@ -28,9 +28,9 @@ const validateNewComment = data => {
   data.commentId = Types.ObjectId().toHexString()
 }
 
-routes.get("/:postId/comments", (req, res) => {
+routes.get('/:postId/comments', (req, res) => {
   const { postId } = req.params
-  Comment.findOne({ postId: postId }, "-_id -uid -__v")
+  Comment.findOne({ postId: postId }, '-_id -uid -__v')
     .then(data => {
       res.send(data)
       console.log(`Comment has been Read ${data}`)
@@ -38,7 +38,7 @@ routes.get("/:postId/comments", (req, res) => {
     .catch(err => res.send(err))
 })
 
-routes.post("/:postId/comments", (req, res) => {
+routes.post('/:postId/comments', (req, res) => {
   validateNewComment(req.body)
   const { postId } = req.params
   const { uid, commentId } = req.body
@@ -49,12 +49,12 @@ routes.post("/:postId/comments", (req, res) => {
     Post.findOneAndUpdate(
       { $and: [{ uid: uid }, { postId: postId }] },
       {
-        $push: { comments: { commentId: commentId } }
+        $push: { comments: { commentId: commentId } },
       }
-    )
+    ),
   ])
     .then(data => {
-      const selected = excludeAndValidate(["_id", "uid", "__v"], data[0]._doc)
+      const selected = excludeAndValidate(['_id', 'uid', '__v'], data[0]._doc)
 
       res.send(selected)
       console.log(`Comment has been Created ${data}`)
@@ -62,38 +62,38 @@ routes.post("/:postId/comments", (req, res) => {
     .catch(err => res.send(err))
 })
 
-routes.put("/:postId/comments/:commentId", (req, res) => {
+routes.put('/:postId/comments/:commentId', (req, res) => {
   const { postId, commentId } = req.params
   const { uid, text } = req.body
   Comment.findOneAndUpdate(
     {
-      $and: [{ uid: uid }, { postId: postId }, { commentId: commentId }]
+      $and: [{ uid: uid }, { postId: postId }, { commentId: commentId }],
     },
     {
-      $set: { text: text }
+      $set: { text: text },
     }
   ).then(data => {
-    const selected = excludeAndValidate(["_id", "uid", "__v"], data[0]._doc)
+    const selected = excludeAndValidate(['_id', 'uid', '__v'], data[0]._doc)
 
     res.send(selected)
     console.log(`Comment has been Updated ${data}`)
   })
 })
 
-routes.delete("/:postId/comments/:commentId", (req, res) => {
+routes.delete('/:postId/comments/:commentId', (req, res) => {
   const { postId, commentId } = req.params
   const { uid } = req.body
 
   Promise.all([
     Comment.findOneAndRemove({
-      $and: [{ uid: uid }, { postId: postId }, { commentId: commentId }]
+      $and: [{ uid: uid }, { postId: postId }, { commentId: commentId }],
     }),
     Post.findOneAndUpdate(
       {
-        $and: [{ uid: uid }, { postId: postId }]
+        $and: [{ uid: uid }, { postId: postId }],
       },
       { $pull: { comments: { $elemMatch: { commentId: commentId } } } }
-    )
+    ),
   ])
     .then(data => {
       res.send()

@@ -1,8 +1,8 @@
-import request from "request-promise"
-import Models from "../Models"
+import request from 'request-promise'
+import Models from '../Models'
 
 const seed = () => {
-  request("https://mysafeinfo.com/api/data?list=presidents&format=json")
+  request('https://mysafeinfo.com/api/data?list=presidents&format=json')
     .then(res => JSON.parse(res))
     .then(res => {
       const data = res.map(r => {
@@ -15,12 +15,12 @@ const seed = () => {
       data.forEach(d => {
         const president = new Models.President(d)
         president.save((err, item) => {
-          console.log("saved:", item)
+          console.log('saved:', item)
         })
       })
     })
     .catch(err => {
-      console.log("err:", err)
+      console.log('err:', err)
     })
 }
 

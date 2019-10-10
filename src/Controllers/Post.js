@@ -1,6 +1,6 @@
-import { Router } from "express"
-import { Post, User } from "../Models"
-import { Types } from "mongoose"
+import { Router } from 'express'
+import { Post, User } from '../Models'
+import { Types } from 'mongoose'
 
 const routes = Router()
 
@@ -28,19 +28,19 @@ const validateNewPost = data => {
   data.postId = Types.ObjectId().toHexString()
 }
 
-routes.get("/", (req, res) => {
+routes.get('/', (req, res) => {
   const toFind = req.body ? req.body : {}
   Post.aggregate([
     { $match: toFind },
     {
       $lookup: {
-        from: "users",
-        localField: "uid",
-        foreignField: "uid",
-        as: "user"
-      }
+        from: 'users',
+        localField: 'uid',
+        foreignField: 'uid',
+        as: 'user',
+      },
     },
-    { $unwind: "$user" },
+    { $unwind: '$user' },
     {
       $project: {
         postId: 1,
@@ -49,10 +49,10 @@ routes.get("/", (req, res) => {
         comments: 1,
         createdAt: 1,
         updatedAt: 1,
-        "user.username": 1,
-        "user.displayName": 1,
-        "user.photoURL": 1,
-        _id: 0
+        'user.username': 1,
+        'user.displayName': 1,
+        'user.photoURL': 1,
+        _id: 0,
         // __v: 0,
         // uid: 0,
         // "user.__v": 0,
@@ -64,17 +64,17 @@ routes.get("/", (req, res) => {
         // "user.posts": 0,
         // "user.createdAt": 0,
         // "user.updatedAt": 0
-      }
-    }
+      },
+    },
   ])
     .then(data => {
       res.send(data)
-      // console.log(`Post has been Read ${data}`)
+      console.log(`Post has been Read ${data}`)
     })
     .catch(err => res.send(err))
 })
 
-routes.post("/", (req, res) => {
+routes.post('/', (req, res) => {
   validateNewPost(req.body)
 
   const { uid, postId } = req.body
@@ -83,10 +83,10 @@ routes.post("/", (req, res) => {
     User.findOneAndUpdate(
       { uid: uid },
       { $push: { posts: { postId: postId } } }
-    )
+    ),
   ])
     .then(data => {
-      const selected = excludeAndValidate(["_id", "uid", "__v"], data[0]._doc)
+      const selected = excludeAndValidate(['_id', 'uid', '__v'], data[0]._doc)
 
       res.send(selected)
       console.log(`Post has been Created ${data}`)
@@ -94,13 +94,13 @@ routes.post("/", (req, res) => {
     .catch(err => res.send(err))
 })
 
-routes.put("/:postId", (req, res) => {
+routes.put('/:postId', (req, res) => {
   const { postId } = req.params
   const { uid, text } = req.body
   Post.findOneAndUpdate(
     { $and: [{ postId: postId }, { uid: uid }] },
     {
-      $set: { text: text }
+      $set: { text: text },
     }
   ).then(data => {
     res.send()
@@ -108,7 +108,7 @@ routes.put("/:postId", (req, res) => {
   })
 })
 
-routes.delete("/:postId", (req, res) => {
+routes.delete('/:postId', (req, res) => {
   const postId = req.params.id
   const { uid } = req.body
 
@@ -117,7 +117,7 @@ routes.delete("/:postId", (req, res) => {
     User.findOneAndUpdate(
       { uid: uid },
       { $pull: { posts: { $elemMatch: { postId: postId } } } }
-    )
+    ),
   ])
     .then(data => {
       res.send()

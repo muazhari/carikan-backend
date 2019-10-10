@@ -1,6 +1,6 @@
-import { Router } from "express"
-import { User } from "../Models"
-import { Types } from "mongoose"
+import { Router } from 'express'
+import { User } from '../Models'
+import { Types } from 'mongoose'
 
 const BASEURL = process.env.BASEURL
 
@@ -31,7 +31,7 @@ const validateNewUser = data => {
     data.username = Types.ObjectId().toHexString()
   }
 
-  if (data.phoneNumber && Object.keys(data.phoneNumber).includes("number")) {
+  if (data.phoneNumber && Object.keys(data.phoneNumber).includes('number')) {
     data.phoneNumber = { ...data.phoneNumber, default: true }
   }
 
@@ -44,7 +44,7 @@ const validateNewUser = data => {
   }
 }
 
-routes.get("/", (req, res) => {
+routes.get('/', (req, res) => {
   // User.find({})
   //   .then(data => res.send(data))
   //   .catch(err => res.send(err))
@@ -52,11 +52,11 @@ routes.get("/", (req, res) => {
   User.findOne({ $or: [{ username: username }, { uid: uid }] })
     .then(data => {
       if (req.body.uid === data.uid) {
-        const selected = excludeAndValidate(["_id", "uid", "__v"], data._doc)
+        const selected = excludeAndValidate(['_id', '__v'], data._doc)
         res.send(selected)
       } else {
         const selected = pickAndValidate(
-          ["photoURL", "displayName", "posts", "createdAt", "updatedAt"],
+          ['photoURL', 'displayName', 'posts', 'createdAt', 'updatedAt'],
           data._doc
         )
         res.send(selected)
@@ -66,29 +66,29 @@ routes.get("/", (req, res) => {
     .catch(err => res.send(err))
 })
 
-routes.post("/", (req, res) => {
+routes.post('/', (req, res) => {
   validateNewUser(req.body)
 
   User.create(req.body)
     .then(data => {
-      const selected = excludeAndValidate(["_id", "uid", "__v"], data._doc)
+      const selected = excludeAndValidate(['_id', 'uid', '__v'], data._doc)
       res.send(selected)
-      console.log(`User has been Created ${data}`)
+      console.log(`User has been Created`, selected)
     })
     .catch(err => res.send(err))
 })
 
-routes.put("/:uid", (req, res) => {
+routes.put('/:uid', (req, res) => {
   const uid = req.params.uid
   User.findOneAndUpdate({ uid: uid }, { $set: { ...req.body } })
     .then(data => {
-      res.send()
+      res.send(data)
       console.log(`User has been Updated ${data}`)
     })
     .catch(err => res.send(err))
 })
 
-routes.delete("/:uid", (req, res) => {
+routes.delete('/:uid', (req, res) => {
   const uid = req.params.uid
   User.findOneAndDelete({ uid: uid })
     .then(data => {

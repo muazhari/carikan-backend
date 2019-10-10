@@ -1,39 +1,39 @@
-import { Schema, model, Types } from "mongoose"
+import { Schema, model, Types } from 'mongoose'
 
 const PostSchema = new Schema(
   {
     uid: {
       type: String,
-      required: true
+      required: true,
     },
     postId: {
       type: String,
       required: true,
-      unique: true
+      unique: true,
     },
     images: {
-      type: [{ imageURL: String, _id: false }]
+      type: [{ imageURL: String, _id: false }],
     },
     text: {
       type: String,
       minlength: 1,
       maxlength: 256,
-      required: true
+      required: true,
     },
     upCount: {
       type: Number,
-      default: 0
+      default: 0,
     },
     comments: {
-      type: [{ commentId: String, _id: false }]
+      type: [{ commentId: String, _id: false }],
     },
     loc: {
       type: { type: String },
-      coordinates: [Number]
-    }
+      coordinates: [Number],
+    },
   },
   { timestamps: true }
 )
 
-const Post = model("post", PostSchema)
+const Post = model('post', PostSchema)
 export default Post
