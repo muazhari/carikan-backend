@@ -4,10 +4,6 @@ import logger from 'morgan'
 import bodyParser from 'body-parser'
 import routes from './routes'
 
-import Comment from './Controllers/Comment'
-import Post from './Controllers/Post'
-import User from './Controllers/User'
-
 import mongoose from 'mongoose'
 
 mongoose
@@ -23,7 +19,8 @@ mongoose
   })
 
 const loggerMiddleware = (req, res, next) => {
-  console.log(`${new Date()} -- Logged: ${req.url}  ${req.method}`)
+  // -- Logged: ${req.url}  ${req.method}
+  console.log(`\n${new Date()}`)
   next()
 }
 
@@ -48,9 +45,6 @@ app.use(express.static(path.join(__dirname, '../public')))
 
 // Routes
 app.use('/', routes)
-app.use('/user', User)
-app.use('/post', Post)
-app.use('/comment', Comment)
 
 // Catch 404 and forward to error handler
 app.use((req, res, next) => {

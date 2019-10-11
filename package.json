@@ -19,7 +19,8 @@
     "dev": "nodemon src/index.js --exec \"node -r dotenv/config -r babel-register\"",
     "clean": "rimraf dist",
     "build": "npm run clean && mkdir -p dist && babel src -s -D -d dist",
-    "test": "jest --watch",
+    "test": "mocha --require babel-core/register --timeout 10000 --exit",
+    "coverage": "nyc --require babel-core/register --reporter=html --reporter=text mocha --exit --timeout 15000",
     "lint": "esw -w src test"
   },
   "keywords": [
@@ -43,6 +44,7 @@
     "chai": "^4.2.0",
     "express": "^4.16.4",
     "mocha": "^6.2.1",
+    "mongoose": "^5.7.4",
     "morgan": "^1.9.1",
     "nyc": "^14.1.1",
     "pug": "^2.0.3",
@@ -64,24 +66,19 @@
   "babel": {
     "presets": [
       [
-        "env",
-        {
+        "env", {
           "targets": {
             "node": "current"
           }
         }
       ]
     ],
-    "plugins": [
-      "transform-object-rest-spread",
-      "transform-class-properties"
-    ]
+    "plugins": ["transform-object-rest-spread", "transform-class-properties"]
   },
   "eslintConfig": {
     "parser": "babel-eslint",
     "plugins": [
-      "import",
-      "jest"
+      "import", "jest"
     ],
     "parserOptions": {
       "ecmaVersion": 2017,
@@ -91,9 +88,7 @@
       "node": true,
       "jest": true
     },
-    "extends": [
-      "eslint:recommended"
-    ],
+    "extends": ["eslint:recommended"],
     "rules": {
       "jest/no-focused-tests": 2,
       "jest/no-identical-title": 2
@@ -103,9 +98,9 @@
     "testEnvironment": "node"
   },
   "bugs": {
-    "url": "https://github.com/vmasto/express-babel/issues"
+    "url": "https://github.com/muazhari/carikan-server/issues"
   },
-  "homepage": "https://github.com/vmasto/express-babel#readme",
+  "homepage": "https://github.com/muazhari/carikan-server#readme",
   "directories": {
     "test": "test"
   }

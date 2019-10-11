@@ -2,33 +2,21 @@ import { Router } from 'express'
 import { Post, User } from '../Models'
 import { Types } from 'mongoose'
 
+import { getKeys, delKeys, setKeys } from '../Helpers/KeysManipulate'
+
 const routes = Router()
 
-const pickAndValidate = (pickKeys, data) => {
-  const selected = {}
-  pickKeys.forEach(keyItem => {
-    // validate
-    if (data[keyItem]) {
-      selected[keyItem] = data[keyItem]
-    }
-  })
-  return selected
-}
-
-const excludeAndValidate = (excludeKeys, data) => {
-  const selected = data
-  excludeKeys.forEach(keyItem => {
-    // validate
-    delete selected[keyItem]
-  })
-  return selected
-}
-
 const validateNewPost = data => {
-  data.postId = Types.ObjectId().toHexString()
+  const dataToValidate = {}
+
+  if (!data.postId) {
+    dataToValidate['postId'] = Types.ObjectId().toHexString()
+  }
+
+  return setKeys(data, dataToValidate)
 }
 
-routes.get('/', (req, res) => {
+const readPost = (req, res) => {
   const toFind = req.body ? req.body : {}
   Post.aggregate([
     { $match: toFind },
@@ -68,13 +56,13 @@ routes.get('/', (req, res) => {
     },
   ])
     .then(data => {
-      res.send(data)
+      res.status(200).send(data)
       console.log(`Post has been Read ${data}`)
     })
     .catch(err => res.send(err))
-})
+}
 
-routes.post('/', (req, res) => {
+const createPost = (req, res) => {
   validateNewPost(req.body)
 
   const { uid, postId } = req.body
@@ -86,15 +74,15 @@ routes.post('/', (req, res) => {
     ),
   ])
     .then(data => {
-      const selected = excludeAndValidate(['_id', 'uid', '__v'], data[0]._doc)
+      const selected = delKeys(data[0]._doc, [('_id', 'uid', '__v')])
 
-      res.send(selected)
+      res.status(200).send(selected)
       console.log(`Post has been Created ${data}`)
     })
     .catch(err => res.send(err))
-})
+}
 
-routes.put('/:postId', (req, res) => {
+const updatePost = (req, res) => {
   const { postId } = req.params
   const { uid, text } = req.body
   Post.findOneAndUpdate(
@@ -103,12 +91,12 @@ routes.put('/:postId', (req, res) => {
       $set: { text: text },
     }
   ).then(data => {
-    res.send()
+    res.status(200).send()
     console.log(`Post has been Updated ${data}`)
   })
-})
+}
 
-routes.delete('/:postId', (req, res) => {
+const deletePost = (req, res) => {
   const postId = req.params.id
   const { uid } = req.body
 
@@ -120,10 +108,10 @@ routes.delete('/:postId', (req, res) => {
     ),
   ])
     .then(data => {
-      res.send()
+      res.status(200).send()
       console.log(`Post has been Deleted ${data}`)
     })
     .catch(err => res.send(err))
-})
+}
 
-export default routes
+export { createPost, readPost, updatePost, deletePost }

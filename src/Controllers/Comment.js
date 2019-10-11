@@ -1,44 +1,31 @@
 import { Router } from 'express'
 import { Post, User, Comment } from '../Models'
 import { Types } from 'mongoose'
+import { getKeys, delKeys, setKeys } from '../Helpers/KeysManipulate'
 
 const routes = Router()
 
-const pickAndValidate = (pickKeys, data) => {
-  const selected = {}
-  pickKeys.forEach(keyItem => {
-    // validate
-    if (data[keyItem]) {
-      selected[keyItem] = data[keyItem]
-    }
-  })
-  return selected
-}
-
-const excludeAndValidate = (excludeKeys, data) => {
-  const selected = data
-  excludeKeys.forEach(keyItem => {
-    // validate
-    delete selected[keyItem]
-  })
-  return selected
-}
-
 const validateNewComment = data => {
-  data.commentId = Types.ObjectId().toHexString()
+  const dataToValidate = {}
+
+  if (!data.commentId) {
+    dataToValidate['commentId'] = Types.ObjectId().toHexString()
+  }
+
+  return setKeys(data, dataToValidate)
 }
 
-routes.get('/:postId/comments', (req, res) => {
+const readComment = (req, res) => {
   const { postId } = req.params
   Comment.findOne({ postId: postId }, '-_id -uid -__v')
     .then(data => {
-      res.send(data)
+      res.status(200).send(data)
       console.log(`Comment has been Read ${data}`)
     })
     .catch(err => res.send(err))
-})
+}
 
-routes.post('/:postId/comments', (req, res) => {
+const createComment = (req, res) => {
   validateNewComment(req.body)
   const { postId } = req.params
   const { uid, commentId } = req.body
@@ -54,15 +41,15 @@ routes.post('/:postId/comments', (req, res) => {
     ),
   ])
     .then(data => {
-      const selected = excludeAndValidate(['_id', 'uid', '__v'], data[0]._doc)
+      const selected = delKeys(data[0]._doc, ['_id', 'uid', '__v'])
 
-      res.send(selected)
+      res.status(200).send(selected)
       console.log(`Comment has been Created ${data}`)
     })
     .catch(err => res.send(err))
-})
+}
 
-routes.put('/:postId/comments/:commentId', (req, res) => {
+const updateComment = (req, res) => {
   const { postId, commentId } = req.params
   const { uid, text } = req.body
   Comment.findOneAndUpdate(
@@ -73,14 +60,14 @@ routes.put('/:postId/comments/:commentId', (req, res) => {
       $set: { text: text },
     }
   ).then(data => {
-    const selected = excludeAndValidate(['_id', 'uid', '__v'], data[0]._doc)
+    const selected = delKeys(data[0]._doc, [('_id', 'uid', '__v')])
 
-    res.send(selected)
+    res.status(200).send(selected)
     console.log(`Comment has been Updated ${data}`)
   })
-})
+}
 
-routes.delete('/:postId/comments/:commentId', (req, res) => {
+const deleteComment = (req, res) => {
   const { postId, commentId } = req.params
   const { uid } = req.body
 
@@ -96,10 +83,10 @@ routes.delete('/:postId/comments/:commentId', (req, res) => {
     ),
   ])
     .then(data => {
-      res.send()
+      res.status(200).send()
       console.log(`Comment has been Deleted ${data}`)
     })
     .catch(err => res.send(err))
-})
+}
 
-export default routes
+export { createComment, readComment, updateComment, deleteComment }
